@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LPJ - QR CHECK</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        #qr-container {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LPJ - QR CHECK</h1>
+    <div id="qr-container"></div>
+    <label class="label" id="server-time-label"></label>
+    <label class="label" id="fecha-label"></label>
+    <label class="label" id="hora-label"></label>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="qrcodejs-master/qrcode.min.js"></script>
+
+    <script>
+        function obtenerFechaHoraServidor() {
+            $.ajax({
+                url: 'obtener_fecha_hora_servidor.php',
+                type: 'GET',
+                success: function (response) {
+                    mostrarCodigoQR(response);
+                    mostrarHoraServidor(response);
+                }
+            });
+        }
+
+        function mostrarCodigoQR(texto) {
+            var qrContainer = document.getElementById('qr-container');
+            qrContainer.innerHTML = ''; // Eliminar el contenido anterior
+            var qrcode = new QRCode(qrContainer, {
+                text: texto,
+                width: 300,
+                height: 300
+            });
+        }
+
+        function mostrarHoraServidor(fechaHora) {
+            var fechaLabel = document.getElementById('fecha-label');
+            var horaLabel = document.getElementById('hora-label');
+        
+            // Separar la fecha y la hora
+            var fecha = fechaHora.split(' ')[0];
+            var hora = fechaHora.split(' ')[1];
+        
+            // Obtener los componentes de la fecha
+            var year = fecha.split('-')[0];
+            var month = fecha.split('-')[1];
+            var day = fecha.split('-')[2];
+        
+            // Formatear la fecha en formato DD/MM/AAAA
+            var fechaFormateada = day + '-' + month + '-' + year;
+        
+            // Actualizar el contenido de las etiquetas
+            fechaLabel.innerHTML = 'Fecha: ' + fechaFormateada;
+            horaLabel.innerHTML = 'Hora: ' + hora;
+        }
+
+        setInterval(obtenerFechaHoraServidor, 15000);
+        obtenerFechaHoraServidor();
+    </script>
+</body>
+
+</html>
